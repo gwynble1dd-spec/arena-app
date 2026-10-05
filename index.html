@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Arena · Бильярд</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root{--bg:#050505;--card:#0b0b0b;--gold:#c9a45c;--line:rgba(201,164,92,.28);--hair:rgba(255,255,255,.09);--tx:#ededed;--mut:#8b8b8b}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.4 -apple-system,"SF Pro Text",Roboto,"Segoe UI",sans-serif}
+body{min-height:100vh;padding:0 14px calc(110px + env(safe-area-inset-bottom));
+ background:
+  repeating-linear-gradient(115deg,transparent 0 26px,rgba(255,255,255,.03) 26px 27px),
+  radial-gradient(120% 60% at 50% -10%,rgba(201,164,92,.10),transparent 60%),var(--bg)}
+.hero{padding:26px 0 14px;text-align:center}
+.hero small{display:block;letter-spacing:.5em;color:var(--gold);font-size:10px;text-transform:uppercase}
+.hero h1{margin:6px 0 10px;font-weight:200;font-size:44px;letter-spacing:.32em;padding-left:.32em}
+.bars{height:14px;background:repeating-linear-gradient(90deg,var(--gold) 0 1px,transparent 1px 7px);
+ -webkit-mask:linear-gradient(90deg,transparent,#000 25%,#000 75%,transparent);mask:linear-gradient(90deg,transparent,#000 25%,#000 75%,transparent);opacity:.7}
+.tabs{display:flex;border:1px solid var(--hair);border-radius:12px;margin:14px 0 18px;overflow:hidden}
+.tabs button{flex:1;padding:11px;background:none;border:0;color:var(--mut);font:inherit;letter-spacing:.12em;text-transform:uppercase;font-size:12px}
+.tabs button.on{color:var(--gold);background:repeating-linear-gradient(135deg,rgba(201,164,92,.16) 0 1px,transparent 1px 5px)}
+.tabs button+button{border-left:1px solid var(--hair)}
+h2{margin:22px 0 10px;font-size:11px;font-weight:500;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);display:flex;align-items:center;gap:10px}
+h2::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
+.row{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}.row::-webkit-scrollbar{display:none}
+.grid{display:grid;gap:8px}.g4{grid-template-columns:repeat(4,1fr)}.g5{grid-template-columns:repeat(5,1fr)}
+.chip{flex:none;min-width:62px;padding:10px 6px;text-align:center;background:var(--card);color:var(--tx);border:1px solid var(--hair);border-radius:10px;font:inherit;font-size:14px;transition:.15s}
+.chip b{display:block;font-weight:300;font-size:20px;line-height:1.1}.chip span{font-size:10px;color:var(--mut);letter-spacing:.14em;text-transform:uppercase}
+.chip.on{border-color:var(--gold);color:var(--gold);background:repeating-linear-gradient(135deg,rgba(201,164,92,.22) 0 1px,transparent 1px 5px),var(--card)}
+.chip:disabled{opacity:.25;text-decoration:line-through}
+.tbl{padding:14px 4px}.tbl b{font-size:22px}
+input{width:100%;padding:13px 14px;margin-bottom:8px;background:var(--card);border:1px solid var(--hair);border-radius:10px;color:var(--tx);font:inherit;outline:0}
+input:focus{border-color:var(--gold)}
+.sum{margin-top:20px;padding:14px;border:1px solid var(--line);border-radius:12px;background:repeating-linear-gradient(135deg,rgba(255,255,255,.025) 0 1px,transparent 1px 6px),var(--card);color:var(--mut);font-size:13px}
+.sum b{color:var(--tx);font-weight:500}
+.cta{width:100%;margin-top:14px;padding:15px;border:1px solid var(--gold);background:var(--gold);color:#000;border-radius:12px;font:inherit;font-weight:600;letter-spacing:.1em;text-transform:uppercase}
+.cta:disabled{opacity:.35}
+.card{border:1px solid var(--hair);border-radius:14px;background:var(--card);padding:4px 16px;margin-bottom:12px}
+.item{display:flex;gap:14px;align-items:flex-start;padding:13px 0}.item+.item{border-top:1px solid var(--hair)}
+.item i{font-style:normal;width:22px;text-align:center}.item small{display:block;color:var(--mut);font-size:11px;letter-spacing:.14em;text-transform:uppercase}
+a{color:var(--gold);text-decoration:none}
+.btn2{display:block;text-align:center;padding:14px;border:1px solid var(--line);border-radius:12px;color:var(--gold);margin-top:10px;letter-spacing:.1em;text-transform:uppercase;font-size:13px}
+.hide{display:none}
+</style>
+</head>
+<body>
+<div class="hero"><small>Billiard club</small><h1>ARENA</h1><div class="bars"></div></div>
+<div class="tabs"><button class="on" data-tab="book">Бронь</button><button data-tab="info">Клуб</button></div>
+
+<main id="book">
+  <h2>Дата</h2><div class="row" id="dates"></div>
+  <h2>Время начала</h2><div class="grid g4" id="hours"></div>
+  <h2>Длительность</h2><div class="row" id="durs"></div>
+  <h2>Стол</h2><div class="grid g4" id="tables"></div>
+  <h2>Контакты</h2>
+  <input id="name" placeholder="Ваше имя" autocomplete="name" maxlength="40">
+  <input id="phone" placeholder="Телефон +7 ..." type="tel" autocomplete="tel" maxlength="20">
+  <div class="sum" id="sum">Выберите дату, время и стол</div>
+  <button class="cta hide" id="sub">Забронировать</button>
+</main>
+
+<main id="info" class="hide">
+  <div class="card">
+    <div class="item"><i>📍</i><div><small>Адрес</small>Москва, ул. Генерала Белова, 8</div></div>
+    <div class="item"><i>🚇</i><div><small>Метро</small>Домодедовская · ≈1,1 км</div></div>
+    <div class="item"><i>🕐</i><div><small>Часы работы</small>Круглосуточно, 24/7</div></div>
+    <div class="item"><i>📞</i><div><small>Менеджер</small><a href="tel:+79911510795">+7 (991) 151-07-95</a></div></div>
+  </div>
+  <div class="card">
+    <div class="item"><i>🎱</i><div><small>Столы</small>8 столов · русский бильярд</div></div>
+    <div class="item"><i>💰</i><div><small>Стоимость</small>500–600 ₽ · уточняйте у администратора</div></div>
+    <div class="item"><i>🏆</i><div><small>Турниры</small>Проводим турниры по бильярду</div></div>
+    <div class="item"><i>🎯</i><div><small>Прокат</small>Прокат киев на месте</div></div>
+    <div class="item"><i>🍹</i><div><small>Бар</small>Напитки и алкоголь</div></div>
+    <div class="item"><i>🛗</i><div><small>Удобства</small>Лифт · туалет · зоны отдыха</div></div>
+  </div>
+  <a class="btn2" id="map" href="https://yandex.ru/maps/org/arena/88111612026/">Открыть на карте</a>
+  <a class="btn2" href="tel:+79911510795">Позвонить менеджеру</a>
+</main>
+
+<script>
+const tg=window.Telegram&&Telegram.WebApp, TABLES=8, DAYS=7, MAXD=5;
+const WD=["Вс","Пн","Вт","Ср","Чт","Пт","Сб"], MON=["янв","фев","мар","апр","мая","июн","июл","авг","сен","окт","ноя","дек"];
+if(tg){tg.ready();tg.expand();try{tg.setHeaderColor("#050505");tg.setBackgroundColor("#050505")}catch(e){}}
+const $=s=>document.querySelector(s), pad=n=>String(n).padStart(2,"0");
+const nd=s=>new Date(s.length<=10?s+"T00:00:00Z":s.replace(" ","T")+":00Z");
+const F=d=>`${d.getUTCFullYear()}-${pad(d.getUTCMonth()+1)}-${pad(d.getUTCDate())} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}`;
+const D=d=>F(d).slice(0,10);
+const q=new URLSearchParams(location.search);
+const NOW=q.get("t")?nd(q.get("t")):new Date(Date.now()-new Date().getTimezoneOffset()*6e4);
+let busy=[];try{busy=JSON.parse(atob(q.get("b").replace(/-/g,"+").replace(/_/g,"/")))}catch(e){}
+const s={date:null,hour:null,dur:1,table:null};
+const add=(str,h)=>F(new Date(nd(str).getTime()+h*36e5));
+const startStr=()=>`${s.date} ${pad(s.hour)}:00`;
+const busyAt=(a,b)=>new Set(busy.filter(x=>x[1]<b&&x[2]>a).map(x=>x[0]));
+
+function mk(el,html){$(el).innerHTML=html}
+function renderDates(){
+  let h="";for(let i=0;i<DAYS;i++){const d=new Date(NOW.getTime()+i*864e5),k=D(d);
+    h+=`<button class="chip ${s.date===k?"on":""}" data-date="${k}"><span>${i?WD[d.getUTCDay()]:"Сегодня"}</span><b>${d.getUTCDate()}</b><span>${MON[d.getUTCMonth()]}</span></button>`}
+  mk("#dates",h)}
+function renderHours(){
+  if(!s.date){mk("#hours",'<div style="grid-column:1/-1;color:var(--mut)">Сначала выберите дату</div>');return}
+  let h="";for(let i=0;i<24;i++){const st=`${s.date} ${pad(i)}:00`;
+    const off=st<=F(NOW)||busyAt(st,add(st,1)).size>=TABLES;
+    h+=`<button class="chip ${s.hour===i?"on":""}" data-hour="${i}" ${off?"disabled":""}>${pad(i)}:00</button>`}
+  mk("#hours",h)}
+function renderDurs(){let h="";for(let i=1;i<=MAXD;i++)h+=`<button class="chip ${s.dur===i?"on":""}" data-dur="${i}"><b>${i}</b><span>час</span></button>`;mk("#durs",h)}
+function renderTables(){
+  if(s.hour===null){mk("#tables",'<div style="grid-column:1/-1;color:var(--mut)">Сначала выберите время</div>');return}
+  const st=startStr(),b=busyAt(st,add(st,s.dur));if(b.has(s.table))s.table=null;
+  let h="";for(let t=1;t<=TABLES;t++)h+=`<button class="chip tbl ${s.table===t?"on":""}" data-table="${t}" ${b.has(t)?"disabled":""}><span>стол</span><b>${t}</b></button>`;
+  mk("#tables",h)}
+function renderSum(){
+  const ok=s.date&&s.hour!==null&&s.table;
+  if(!ok){mk("#sum","Выберите дату, время и стол")}
+  else{const st=startStr(),d=nd(st);
+   mk("#sum",`<b>Стол №${s.table}</b> · ${d.getUTCDate()} ${MON[d.getUTCMonth()]}<br><b>${st.slice(11)} – ${add(st,s.dur).slice(11)}</b> · ${s.dur} ч`)}
+  const label=ok?`Забронировать · стол ${s.table}`:"Забронировать";
+  if(tg){const mb=tg.MainButton;mb.setParams({text:label.toUpperCase(),color:"#c9a45c",text_color:"#000000"});ok?mb.show():mb.hide()}
+  else{$("#sub").textContent=label;$("#sub").classList.toggle("hide",!ok)}}
+const all=()=>{renderDates();renderHours();renderDurs();renderTables();renderSum()};
+
+document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-date],[data-hour],[data-dur],[data-table],[data-tab]");if(!b||b.disabled)return;
+  const d=b.dataset;
+  if(d.tab){document.querySelectorAll(".tabs button").forEach(x=>x.classList.toggle("on",x===b));
+    $("#book").classList.toggle("hide",d.tab!=="book");$("#info").classList.toggle("hide",d.tab!=="info");
+    if(tg){d.tab==="book"?renderSum():tg.MainButton.hide()}return}
+  if(d.date){s.date=d.date;s.hour=null;s.table=null}
+  if(d.hour)s.hour=+d.hour;
+  if(d.dur)s.dur=+d.dur;
+  if(d.table)s.table=+d.table;
+  tg&&tg.HapticFeedback&&tg.HapticFeedback.selectionChanged();all()});
+
+function submit(){
+  const name=$("#name").value.trim(),phone=$("#phone").value.trim(),dg=phone.replace(/\D/g,"");
+  const err=m=>tg?tg.showAlert(m):alert(m);
+  if(name.length<2)return err("Введите имя");
+  if(dg.length<10||dg.length>12)return err("Введите корректный телефон");
+  const data=JSON.stringify({d:s.date,h:s.hour,u:s.dur,t:s.table,n:name,p:phone});
+  tg?tg.sendData(data):alert("Демо-режим (вне Telegram):\n"+data)}
+if(tg){tg.MainButton.onClick(submit);const u=tg.initDataUnsafe&&tg.initDataUnsafe.user;if(u&&u.first_name)$("#name").value=u.first_name;
+  $("#map").addEventListener("click",e=>{e.preventDefault();tg.openLink(e.currentTarget.href)})}
+else $("#sub").addEventListener("click",submit);
+s.date=D(NOW);all();
+</script>
+</body>
+</html>
