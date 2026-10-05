@@ -78,6 +78,8 @@ a{color:var(--gold);text-decoration:none}
   </div>
   <a class="btn2" id="map" href="https://yandex.ru/maps/org/arena/88111612026/">Открыть на карте</a>
   <a class="btn2" href="tel:+79911510795">Позвонить менеджеру</a>
+  <button class="btn2" id="bookbot" style="width:100%;background:none;font:inherit">🎱 Забронировать стол</button>
+</main>
 </main>
 
 <script>
@@ -145,7 +147,13 @@ function submit(){
 if(tg){tg.MainButton.onClick(submit);const u=tg.initDataUnsafe&&tg.initDataUnsafe.user;if(u&&u.first_name)$("#name").value=u.first_name;
   $("#map").addEventListener("click",e=>{e.preventDefault();tg.openLink(e.currentTarget.href)})}
 else $("#sub").addEventListener("click",submit);
+const BOT_LINK="https://t.me/arena_kashirskoe_bot?start=book";
+$("#bookbot").addEventListener("click",()=>{
+  if(tg){tg.openTelegramLink(BOT_LINK);tg.close()}
+  else window.open(BOT_LINK)
+});
 s.date=D(NOW);all();
+
 </script>
 </body>
 </html>
